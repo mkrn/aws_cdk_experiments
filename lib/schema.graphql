@@ -1,0 +1,34 @@
+type S3Object {
+    bucket: String!
+    key: String!
+    region: String!
+}
+
+input S3ObjectInput {
+    bucket: String!
+    key: String!
+    region: String!
+    localUri: String
+    mimeType: String
+}
+
+type Item {
+    id: ID
+    name: String
+    file: S3Object
+}
+
+
+type Query {
+    items: [Item]
+}
+
+type Mutation {
+    addItem(name: String! file: S3ObjectInput): Item!
+}
+
+type Schema {
+    query: Query
+    mutation: Mutation
+}
+
