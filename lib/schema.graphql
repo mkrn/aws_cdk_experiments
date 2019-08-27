@@ -12,7 +12,9 @@ input S3ObjectInput {
     mimeType: String
 }
 
-type Item {
+type Item 
+@aws_iam
+@aws_api_key {
     id: ID
     name: String
     file: S3Object
@@ -20,11 +22,12 @@ type Item {
 
 
 type Query {
-    items: [Item]
+    items: [Item] @aws_iam @aws_api_key
 }
 
+
 type Mutation {
-    addItem(name: String! file: S3ObjectInput): Item!
+    addItem(name: String! file: S3ObjectInput): Item! @aws_iam @aws_api_key
 }
 
 type Schema {
@@ -32,3 +35,8 @@ type Schema {
     mutation: Mutation
 }
 
+
+schema {
+  query: Query
+  mutation: Mutation
+}

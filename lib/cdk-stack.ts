@@ -1,7 +1,8 @@
 import cdk = require('@aws-cdk/core');
 import { CfnGraphQLApi, CfnApiKey, CfnGraphQLSchema, CfnResolver } from '@aws-cdk/aws-appsync';
 import { AttributeType } from '@aws-cdk/aws-dynamodb';
-import { Role, ServicePrincipal, ManagedPolicy } from '@aws-cdk/aws-iam';
+import iam = require('@aws-cdk/aws-iam');
+import { Role, ServicePrincipal, ManagedPolicy, PolicyStatement } from '@aws-cdk/aws-iam';
 import lambda = require('@aws-cdk/aws-lambda');
 import { TableWithDataSource } from './tableWithDataSource';
 import fs = require('fs');
@@ -13,7 +14,12 @@ export class CdkStack extends cdk.Stack {
 
     const graphQLAPI = new CfnGraphQLApi(this, 'ItemsApi', {
       name: 'items-api',
-      authenticationType: 'API_KEY'
+      authenticationType: 'API_KEY',
+      additionalAuthenticationProviders: [
+        {
+          authenticationType: 'AWS_IAM'
+        }
+      ]
     });
 
     new CfnApiKey(this, 'ItemsApiKey', {
@@ -22,7 +28,7 @@ export class CdkStack extends cdk.Stack {
 
     const hello = new lambda.Function(this, 'HelloHandler', {
       runtime: lambda.Runtime.NODEJS_8_10,
-      code: lambda.Code.asset('lambda'),
+      code: lambda.Code.asset('lambda'),  //new lambda.AssetCode('lambda'),
       handler: 'hello.handler'
     });
 
@@ -77,5 +83,28 @@ export class CdkStack extends cdk.Stack {
       responseMappingTemplate: RESPONSE_SINGLE
     });
     addItemResolver.addDependsOn(items.dataSource);
+
+    const allItemsLambda = new lambda.Function(this, 'GetAllItemsLambda', {
+      runtime: lambda.Runtime.NODEJS_8_10,
+      code: lambda.Code.asset('lambda'),  //new lambda.AssetCode('lambda'),
+      handler: 'getAllItems.handler',
+      environment: {
+        GRAPHQL_API_URL: graphQLAPI.attrGraphQlUrl,
+      }
+    });
+
+    // const permission = new lambda.CfnPermission(this, 'LambdaPermission', {
+
+    // })
+
+    allItemsLambda.addToRolePolicy(new iam.PolicyStatement({
+      actions: ['appsync:GraphQL'],
+      resources: [
+        `${graphQLAPI.attrArn}/types/Query/*`,
+        `${graphQLAPI.attrArn}/types/Mutation/*`
+      ],
+      effect: iam.Effect.ALLOW
+    }))
+    
   }
 }
