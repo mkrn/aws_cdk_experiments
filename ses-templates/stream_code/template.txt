@@ -1,0 +1,3 @@
+Hi,
+
+Here's your stream key: '{{broadcaster.stream_key}}'

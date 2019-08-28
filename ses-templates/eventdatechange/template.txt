@@ -1,0 +1,13 @@
+Dear {{guest.name}},
+
+There has been a change to go live date or time for {{event.title}}.
+
+{{event.title}} is now scheduled to start on {{formatted_date}}.
+
+Please keep it in mind.
+
+We will send you reminders in advance to make sure you don't miss it!
+
+Best,
+
+EventLive

@@ -12,22 +12,122 @@ input S3ObjectInput {
     mimeType: String
 }
 
+type GuestbookMessage @aws_api_key
+@aws_iam
+@aws_cognito_user_pools {
+  id: ID!
+  event_id: String!
+  broadcaster: String!
+  slug: String!
+  guest: Guest
+  message: String!
+  message_datetime_utc: String!
+}
+
+enum EventPrivacySetting {
+  public
+  password_protected
+  unlisted
+}
+
+enum EventStatus {
+  upcoming
+  pending
+  live
+  paused
+  past
+}
+
+type Guest {
+  id: ID!
+    @aws_api_key
+@aws_iam
+@aws_cognito_user_pools
+  broadcaster: String!
+  slug: String!
+  name: String
+    @aws_api_key
+@aws_iam
+@aws_cognito_user_pools
+  email: String!
+  @aws_api_key
+@aws_iam
+@aws_cognito_user_pools
+  datetime_registered: String!
+}
+
+type Broadcaster 
+@aws_api_key
+@aws_iam {
+  username: String!
+  custom_domain: String
+  company_name: String
+  background_color: String
+  logo_path: String
+  stream_key: String!
+  email: String
+  events: [Event]
+  current_event: [Event]
+  is_wedding_client: Boolean
+}
+
+type Event @aws_api_key
+@aws_iam {
+  id: ID!
+  broadcaster: String!
+  profile: Broadcaster
+  slug: String!
+  title: String!
+  event_create_datetime: String
+  stream_key: String
+  event_datetime_utc: String!
+  event_window_start_datetime_utc: String
+  event_window_end_datetime_utc: String
+  event_timezone: String!
+  event_privacy: EventPrivacySetting!
+  event_status: EventStatus!
+  event_location: String
+  guestbook_enabled: Boolean
+  download_enabled: Boolean
+  download_pin_enabled: Boolean
+  is_test: Boolean
+  download_pin: String
+  event_password: String
+  is_published: Boolean
+  is_paid: Boolean
+  stream_id: String
+  playlist_url: String
+  event_cover_path: String
+  vod_filename: String
+  datetime_broadcast_started: String
+  datetime_broadcast_stopped: String
+  last_start_notification_datetime_utc: String
+  guests: [Guest]
+  guestbook_messages: [GuestbookMessage]
+  guestsCount: Int
+  liveCount: Int
+}
+
 type Item 
 @aws_iam
 @aws_api_key {
     id: ID
     name: String
     file: S3Object
+    email: String
+    given_name: String
+    family_name: String
 }
 
 
 type Query {
     items: [Item] @aws_iam @aws_api_key
+    event(broadcaster: String!, slug: String!): Event @aws_iam @aws_api_key
 }
 
 
 type Mutation {
-    addItem(name: String! file: S3ObjectInput): Item! @aws_iam @aws_api_key
+    addItem(name: String! email: String! given_name: String! family_name: String! file: S3ObjectInput): Item! @aws_iam @aws_api_key
 }
 
 type Schema {

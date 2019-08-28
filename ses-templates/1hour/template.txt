@@ -1,0 +1,3 @@
+Dear {{guest.name}},
+
+{{event.title}} starts in one hour, at {{event.event_datetime_utc}}.

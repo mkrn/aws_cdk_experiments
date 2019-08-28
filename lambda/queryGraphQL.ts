@@ -6,7 +6,12 @@ const AWS = require('aws-sdk');
 export interface PostBody {
   operationName: string,
   query: string,
-  variables: object
+  variables?: object
+}
+
+export interface GraphQLReturn {
+  data: any,
+  error?: object
 }
 
 // Authenticate as lambda
@@ -15,7 +20,7 @@ AWS.config.update({
     credentials: new AWS.Credentials(env.AWS_ACCESS_KEY_ID, env.AWS_SECRET_ACCESS_KEY, env.AWS_SESSION_TOKEN)
 });
 
-export async function QueryGraphQL (graphQLApiUrl: string, post_body: PostBody): Promise<object> {
+export async function QueryGraphQL (graphQLApiUrl: string, post_body: PostBody): Promise<GraphQLReturn> {
   try {
     const uri = URL.parse(graphQLApiUrl);
     console.log(`Posting = ${JSON.stringify(post_body, null, 2)}`)

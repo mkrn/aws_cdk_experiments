@@ -1,16 +1,20 @@
 import cdk = require('@aws-cdk/core');
 import { CfnGraphQLApi, CfnApiKey, CfnGraphQLSchema, CfnDataSource, CfnResolver } from '@aws-cdk/aws-appsync';
 import { Table, AttributeType, StreamViewType, BillingMode, Attribute } from '@aws-cdk/aws-dynamodb';
-import { timingSafeEqual } from 'crypto';
+import lambda = require('@aws-cdk/aws-lambda');
 import { Role } from '@aws-cdk/aws-iam'
+import { DynamoEventSource } from '@aws-cdk/aws-lambda-event-sources'
+import { LambdaIntegration } from '@aws-cdk/aws-apigateway';
 
 export interface TableWithDataSourceProps {
   /** the function for which we want to count url hits **/
   graphQLAPI: CfnGraphQLApi,
   tableName: string,
   partitionKey: Attribute,
+  sortKey?: Attribute,
   appSyncRole: Role,
-  awsRegion: string
+  awsRegion: string,
+  trigger?: lambda.Function
 }
 
 export class TableWithDataSource extends cdk.Construct {
@@ -25,13 +29,17 @@ export class TableWithDataSource extends cdk.Construct {
         partitionKey,
         graphQLAPI,
         appSyncRole,
-        awsRegion
+        awsRegion,
+        sortKey,
+        trigger,
     } = props;
 
     this.table = new Table(this, `${tableName}Table`, {
         tableName,
         partitionKey,
-        billingMode: BillingMode.PAY_PER_REQUEST
+        billingMode: BillingMode.PAY_PER_REQUEST,
+        stream: StreamViewType.NEW_AND_OLD_IMAGES,
+        sortKey: sortKey
     });
     
     this.dataSource = new CfnDataSource(this, `${tableName}TableDataSource`, {
@@ -40,9 +48,17 @@ export class TableWithDataSource extends cdk.Construct {
         type: 'AMAZON_DYNAMODB',
         dynamoDbConfig: {
             tableName: this.table.tableName,
-            awsRegion
+            awsRegion //: scope.node.metadata[Symbol]
         },
         serviceRoleArn: appSyncRole.roleArn,
     });
+
+    if (trigger) {
+      trigger.addEventSource(new DynamoEventSource(this.table, {
+        startingPosition: lambda.StartingPosition.LATEST,
+        batchSize: 1
+      }));
+    }
+    
   }
 }

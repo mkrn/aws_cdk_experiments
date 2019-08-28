@@ -1,0 +1,9 @@
+Dear {{guest.name}},
+
+You've registered to watch {{event.title}} online on {{event.event_datetime_utc}}
+
+View Event Page at https://{{event.broadcaster}}.eventlive.pro/video/{{event.slug}}
+
+Best,
+
+Eventlive.pro

@@ -1,0 +1,3 @@
+Hi,
+
+{{event.title}} is now live!

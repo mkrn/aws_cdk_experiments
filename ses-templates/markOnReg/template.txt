@@ -1,0 +1,6 @@
+Hi,
+
+New User Registered:
+{{broadcaster.first_name}}
+{{broadcaster.last_name}}
+{{broadcaster.email}}
