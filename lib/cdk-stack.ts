@@ -28,28 +28,24 @@ export class CdkStack extends cdk.Stack {
 
     new SESEmailTemplate(this, 'Email1', {
       TemplateName: '1hour',
-      TextPart: fs.readFileSync(__dirname + '/../ses-templates/1hour/template.txt', 'utf8'),
       HtmlPart: fs.readFileSync(__dirname + '/../ses-templates/1hour/template.html', 'utf8'),
       SubjectPart: '1 hour until event is live yohoo!'
     });
 
     new SESEmailTemplate(this, 'Email2', {
       TemplateName: '15minutes',
-      TextPart: fs.readFileSync(__dirname + '/../ses-templates/15minutes/template.txt', 'utf8'),
       HtmlPart: fs.readFileSync(__dirname + '/../ses-templates/15minutes/template.html', 'utf8'),
       SubjectPart: '15 minutes till your event'
     });
 
     new SESEmailTemplate(this, 'Email3', {
       TemplateName: 'markOnReg',
-      TextPart: fs.readFileSync(__dirname + '/../ses-templates/markOnReg/template.txt', 'utf8'),
       HtmlPart: fs.readFileSync(__dirname + '/../ses-templates/markOnReg/template.html', 'utf8'),
       SubjectPart: 'New User on EventLive'
     });
 
     new SESEmailTemplate(this, 'Email4', {
       TemplateName: 'markSpecialEventCreated',
-      TextPart: 'Someone created special event',
       HtmlPart: `
         Hi Mark! <br /> 
         https://live.eventlive.pro/{{data.event.broadcaster}}/{{data.event.slug}} <br />
@@ -61,7 +57,6 @@ export class CdkStack extends cdk.Stack {
 
     new SESEmailTemplate(this, 'Email5', {
       TemplateName: 'markSpecialEventPurchased',
-      TextPart: 'Someone purchased special event',
       HtmlPart: `
         Hi Mark! <br /> 
         https://live.eventlive.pro/{{data.event.broadcaster}}/{{data.event.slug}} <br />
@@ -219,7 +214,7 @@ export class CdkStack extends cdk.Stack {
         EVENTS_TABLE_NAME: eventsTable.table.tableName,
       }
     });
-    eventsTable.table.grantReadData(eventCheckCronLambda);
+    eventsTable.table.grantReadWriteData(eventCheckCronLambda);
     eventsTopic.grantPublish(eventCheckCronLambda);
 
     const rule = new events.Rule(this, 'EventCheckCronLambdaRule', {
