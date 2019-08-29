@@ -7,7 +7,6 @@ import { DynamoEventSource } from '@aws-cdk/aws-lambda-event-sources'
 import { LambdaIntegration } from '@aws-cdk/aws-apigateway';
 
 export interface TableWithDataSourceProps {
-  /** the function for which we want to count url hits **/
   graphQLAPI: CfnGraphQLApi,
   tableName: string,
   partitionKey: Attribute,
