@@ -1,10 +1,9 @@
 import cdk = require('@aws-cdk/core');
-import { CfnGraphQLApi, CfnApiKey, CfnGraphQLSchema, CfnDataSource, CfnResolver } from '@aws-cdk/aws-appsync';
-import { Table, AttributeType, StreamViewType, BillingMode, Attribute } from '@aws-cdk/aws-dynamodb';
+import { CfnGraphQLApi, CfnDataSource } from '@aws-cdk/aws-appsync';
+import { Table, StreamViewType, BillingMode, Attribute } from '@aws-cdk/aws-dynamodb';
 import lambda = require('@aws-cdk/aws-lambda');
 import { Role } from '@aws-cdk/aws-iam'
 import { DynamoEventSource } from '@aws-cdk/aws-lambda-event-sources'
-import { LambdaIntegration } from '@aws-cdk/aws-apigateway';
 
 export interface TableWithDataSourceProps {
   graphQLAPI: CfnGraphQLApi,
@@ -47,7 +46,7 @@ export class TableWithDataSource extends cdk.Construct {
         type: 'AMAZON_DYNAMODB',
         dynamoDbConfig: {
             tableName: this.table.tableName,
-            awsRegion //: scope.node.metadata[Symbol]
+            awsRegion 
         },
         serviceRoleArn: appSyncRole.roleArn,
     });

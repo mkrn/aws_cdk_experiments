@@ -88,7 +88,7 @@ export class CdkStack extends cdk.Stack {
 
     const schema = new CfnGraphQLSchema(this, 'Schema', {
       apiId: graphQLAPI.attrApiId,
-      definition: fs.readFileSync(__dirname + '/schema.graphql', 'utf8'),
+      definition: fs.readFileSync(path.join(__dirname, '../assets/schema.graphql'), 'utf8'),
     });
     
     const appSyncRole = new Role(this, 'ItemsDynamoDBRole', {
